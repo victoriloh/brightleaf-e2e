@@ -99,6 +99,75 @@ jobs:
           name: compose-logs
           path: compose-logs.txt
 
+  test-remote:
+    name: e2e (remote env)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # Prefer repository Variables; fallback to Secrets if provided
+      BASE_URL: ${{ vars.BASE_URL != '' && vars.BASE_URL || secrets.BASE_URL }}
+      API_URL: ${{ vars.API_URL != '' && vars.API_URL || secrets.API_URL }}
+      HEADLESS: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Show target environment
+        run: |
+          echo "BASE_URL=$BASE_URL"
+          echo "API_URL=$API_URL"
+
+      - name: Validate env
+        run: |
+          if [ -z "$BASE_URL" ] || [ -z "$API_URL" ]; then
+            echo "BASE_URL and/or API_URL are not set. Configure repository Variables or Secrets." >&2
+            exit 1
+          fi
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright dependencies and browsers
+        uses: microsoft/playwright-github-action@v1
+
+      - name: Install browsers via script (compat)
+        run: npm run prep
+
+      - name: Check health endpoints
+        run: |
+          echo "Checking API health at $API_URL/health";
+          curl -fsS "$API_URL/health"
+          echo "Checking frontend at $BASE_URL/login.html";
+          curl -fsS "$BASE_URL/login.html" | head -n 5
+
+      - name: Run E2E
+        run: npm test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-remote
+          path: playwright-report
+
+      - name: Upload Cucumber HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-html-report-remote
+          path: reports/html
+
+      - name: Upload Cucumber JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json-remote
+          path: reports/cucumber-report.json
+
       - name: Bring down app stack
         if: always()
         run: |
