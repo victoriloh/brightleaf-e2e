@@ -1,0 +1,7 @@
+.env
+playwright-report/
+reports/cucumber-report.json
+reports/html/
+test-results/
+node_modules/
+*.log

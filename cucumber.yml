@@ -1,0 +1,39 @@
+default:
+  paths:
+    - tests/features/**/*.feature
+  requireModule:
+    - ts-node/register
+  require:
+    - tests/steps/**/*.ts
+    - tests/support/**/*.ts
+  format:
+    - progress-bar
+    - json:./reports/cucumber-report.json
+  worldParameters:
+    baseUrl: http://localhost:8080
+    apiUrl: http://localhost:3000/api
+  tags: "not @wip"
+
+headed:
+  extends: default
+  paths:
+    - tests/features/**/*.feature
+  requireModule:
+    - ts-node/register
+  require:
+    - tests/steps/**/*.ts
+    - tests/support/**/*.ts
+  worldParameters:
+    headless: false
+
+debug:
+  extends: default
+  paths:
+    - tests/features/**/*.feature
+  requireModule:
+    - ts-node/register
+  require:
+    - tests/steps/**/*.ts
+    - tests/support/**/*.ts
+  worldParameters:
+    headless: false

@@ -1,0 +1,34 @@
+{
+  "name": "brightleaf-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prep": "npx playwright install --with-deps && npx playwright install-deps",
+    "test": "cucumber-js -p default --require-module ts-node/register",
+    "test:headed": "cucumber-js -p headed",
+    "test:ui": "cucumber-js -p debug",
+  "test:smoke": "playwright test tests/smoke --reporter=html",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+  "report": "ts-node ./scripts/show-report.ts",
+  "report:cucumber": "ts-node ./scripts/show-report.ts --cucumber",
+  "report:serve": "npx playwright show-report",
+    "typecheck": "tsc -p .",
+    "docker:test": "ts-node ./scripts/run-in-docker.ts"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^11.0.0",
+    "dotenv": "^16.4.5",
+    "expect": "^29.7.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^20.19.23",
+    "eslint": "^9.11.1",
+    "playwright": "^1.56.1",
+    "prettier": "^3.3.3",
+    "multiple-cucumber-html-reporter": "^3.7.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
