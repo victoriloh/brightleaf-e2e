@@ -1,15 +1,15 @@
-# 🌿 BrightLeaf E2E (Playwright + Cucumber)
+# BrightLeaf E2E (Playwright + Cucumber)
 
 End-to-end, BDD-style tests for the QA Evaluation App (LeafTasks-like).
 
-## ✨ What you get
+## What you get
 - Playwright + Cucumber (Gherkin) setup
 - Feature files covering auth and core task flows
 - Page Objects for maintainability
 - API-backed cleanup hooks to keep data clean
 - Works **locally** and **in Docker**
 
-## 📦 Project layout
+## Project layout
 ```
 tests/
   features/          # .feature files
@@ -21,7 +21,7 @@ cucumber.yml         # runtime profiles
 playwright.config.ts # test runner config (report, trace, video)
 ```
 
-## 🚀 Run locally
+## Run locally
 
 1. Start the app (from the app root):
 
@@ -50,7 +50,7 @@ npm run test:headed
 npm run report
 ```
 
-## 🐳 Run tests in Docker
+## Run tests in Docker
 
 From this folder:
 
@@ -64,7 +64,7 @@ This will:
 - Build a Playwright image with tests
 - Execute tests against `http://frontend:8080` / `http://backend:3000`
 
-## 🔧 Config
+## Config
 
 Adjust via env (create `.env` from `.env.example` if needed):
 
@@ -74,7 +74,7 @@ API_URL=http://localhost:3000/api
 HEADLESS=true
 ```
 
-## 🧪 Scenarios covered
+## Scenarios covered
 
 - Login (valid / invalid) and logout
 - Create task (valid / validation error)
@@ -82,7 +82,7 @@ HEADLESS=true
 - Delete task
 - Mark task as completed
 
-## 🧱 Best practices applied
+## Best practices applied
 
 - BDD with readable Gherkin feature files
 - Page Object Model for UI operations
@@ -92,4 +92,4 @@ HEADLESS=true
 
 ---
 
-Made for BrightLeaf Technologies by your friendly Senior QA 🤝
+Made for BrightLeaf Technologies by your friendly Senior QA
