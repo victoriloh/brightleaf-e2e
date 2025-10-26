@@ -18,10 +18,27 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+        with:
+          repository: victoriloh/qa-evaluation-app
+          path: app
+
       - name: Launch app stack
         run: |
-          docker compose -f ../qa-evaluation-app/qa-evaluation-app/docker-compose.yml up -d --build
-          sleep 5
+          docker compose -f app/qa-evaluation-app/docker-compose.yml up -d --build
+
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3000/api/health >/dev/null; then
+              echo "API is up"; break; fi
+            echo "Waiting for API... ($i)"; sleep 3;
+          done
+          curl -fsS http://localhost:3000/api/health
+
+      - name: Install Playwright browsers
+        run: npm run prep
 
       - name: Run E2E
         run: npm test
@@ -32,3 +49,22 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
+
+      - name: Upload Cucumber HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-html-report
+          path: reports/html
+
+      - name: Upload Cucumber JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json
+          path: reports/cucumber-report.json
+
+      - name: Bring down app stack
+        if: always()
+        run: |
+          docker compose -f app/qa-evaluation-app/docker-compose.yml down
