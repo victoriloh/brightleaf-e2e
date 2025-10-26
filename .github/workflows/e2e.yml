@@ -23,10 +23,19 @@ jobs:
         with:
           repository: victoriloh/qa-evaluation-app
           path: app
+          # If the app repo is private, create a repo secret APP_REPO_TOKEN with 'repo' scope and uncomment:
+          # token: ${{ secrets.APP_REPO_TOKEN }}
+
+      - name: Detect docker-compose file
+        run: |
+          set -euxo pipefail
+          if [ -f app/docker-compose.yml ]; then echo "COMPOSE=app/docker-compose.yml" >> $GITHUB_ENV; fi
+          if [ -f app/qa-evaluation-app/docker-compose.yml ]; then echo "COMPOSE=app/qa-evaluation-app/docker-compose.yml" >> $GITHUB_ENV; fi
+          if [ -z "${COMPOSE:-}" ]; then echo "Compose file not found under app/. Contents:"; ls -R app; exit 1; fi
 
       - name: Launch app stack
         run: |
-          docker compose -f app/qa-evaluation-app/docker-compose.yml up -d --build
+          docker compose -f "${COMPOSE}" up -d --build
 
       - name: Wait for API health
         run: |
@@ -37,7 +46,9 @@ jobs:
           done
           curl -fsS http://localhost:3000/api/health
 
-      - name: Install Playwright browsers
+      - name: Install Playwright dependencies and browsers
+        uses: microsoft/playwright-github-action@v1
+      - name: Install browsers via script (compat)
         run: npm run prep
 
       - name: Run E2E
