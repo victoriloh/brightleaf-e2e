@@ -3,10 +3,12 @@ name: e2e
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -46,6 +48,15 @@ jobs:
           done
           curl -fsS http://localhost:3000/api/health
 
+      - name: Wait for Frontend
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8080/login.html >/dev/null; then
+              echo "Frontend is up"; break; fi
+            echo "Waiting for Frontend... ($i)"; sleep 3;
+          done
+          curl -fsS http://localhost:8080/login.html
+
       - name: Install Playwright dependencies and browsers
         uses: microsoft/playwright-github-action@v1
       - name: Install browsers via script (compat)
@@ -74,6 +85,19 @@ jobs:
         with:
           name: cucumber-json
           path: reports/cucumber-report.json
+
+      - name: Capture docker compose status and logs
+        if: failure()
+        run: |
+          docker compose -f "${COMPOSE}" ps -a || true
+          docker compose -f "${COMPOSE}" logs --no-color > compose-logs.txt || true
+
+      - name: Upload compose logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-logs
+          path: compose-logs.txt
 
       - name: Bring down app stack
         if: always()
