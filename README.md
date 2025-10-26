@@ -90,6 +90,3 @@ HEADLESS=true
 - Explicit waits and robust locators
 - Artifacts: trace/video/screenshots on failure
 
----
-
-Made for BrightLeaf Technologies by your friendly Senior QA
